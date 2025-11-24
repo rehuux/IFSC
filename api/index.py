@@ -7,7 +7,7 @@ app = Flask(__name__)
 def home():
     return jsonify({
         "message": "IFSC Lookup API",
-        "usage": "/api/ifsc?ifsc=YESB0XXXXXX",
+        "usage": "/api/ifsc?ifsc=XXXX",
         "developer": "@istgrehu"
     })
 
@@ -22,31 +22,22 @@ def ifsc_lookup():
         }), 400
 
     try:
-        api_url = f"https://ifsc.razorpay.com/{ifsc.strip()}"
-        r = requests.get(api_url)
+        url = f"https://ifsc.razorpay.com/{ifsc.strip()}"
+        res = requests.get(url)
 
-        if r.status_code != 200:
+        if res.status_code != 200:
             return jsonify({
-                "error": "Invalid IFSC code or not found",
+                "error": "Invalid IFSC",
                 "developer": "@istgrehu"
             }), 404
 
-        data = r.json()
+        data = res.json()
         data["developer"] = "@istgrehu"
         return jsonify(data)
 
     except Exception as e:
         return jsonify({
-            "error": "Something went wrong",
+            "error": "Server error",
             "detail": str(e),
             "developer": "@istgrehu"
         }), 500
-
-
-def handler(request, *args, **kwargs):
-    with app.test_request_context(
-        path=request.path,
-        method=request.method,
-        query_string=request.query_string
-    ):
-        return app.full_dispatch_request()
