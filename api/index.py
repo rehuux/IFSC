@@ -3,6 +3,14 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+@app.route("/")
+def home():
+    return jsonify({
+        "message": "IFSC Lookup API",
+        "usage": "/api/ifsc?ifsc=YESB0XXXXXX",
+        "developer": "@istgrehu"
+    })
+
 @app.route("/api/ifsc", methods=["GET"])
 def ifsc_lookup():
     ifsc = request.args.get("ifsc")
@@ -17,7 +25,6 @@ def ifsc_lookup():
         api_url = f"https://ifsc.razorpay.com/{ifsc.strip()}"
         r = requests.get(api_url)
 
-        # If not found
         if r.status_code != 200:
             return jsonify({
                 "error": "Invalid IFSC code or not found",
@@ -25,10 +32,7 @@ def ifsc_lookup():
             }), 404
 
         data = r.json()
-
-        # Add developer tag in success response
         data["developer"] = "@istgrehu"
-
         return jsonify(data)
 
     except Exception as e:
